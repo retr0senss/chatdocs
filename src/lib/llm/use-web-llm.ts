@@ -22,7 +22,7 @@ interface UseWebLLMReturn {
   isGenerating: boolean;
   sendMessage: (content: string) => Promise<void>;
   setDocument: (document: ProcessedDocument) => void;
-  service: WebLLMService | OpenAIService | null; 
+  service: WebLLMService | OpenAIService | null;
   apiSettings: ApiSettings;
   updateApiSettings: (settings: ApiSettings) => void;
 }
@@ -96,8 +96,8 @@ export function useWebLLM(): UseWebLLMReturn {
   const initOpenAI = useCallback(() => {
     if (
       openaiServiceRef.current &&
-      openaiServiceRef.current.apiKey === apiSettings.apiKey &&
-      openaiServiceRef.current.model === apiSettings.model
+      openaiServiceRef.current.getApiKey() === apiSettings.apiKey &&
+      openaiServiceRef.current.getModel() === apiSettings.model
     ) {
       return;
     }

@@ -31,6 +31,14 @@ export class OpenAIService {
     this.temperature = config.temperature || 0.7;
   }
 
+  getApiKey(): string {
+    return this.apiKey;
+  }
+
+  getModel(): string {
+    return this.model;
+  }
+
   setDocument(document: ProcessedDocument) {
     this.document = document;
     this.chatHistory = [];
