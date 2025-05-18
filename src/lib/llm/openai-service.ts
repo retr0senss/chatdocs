@@ -7,6 +7,11 @@ interface ChatMessage {
   content: string;
 }
 
+interface OpenAIMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
 export interface OpenAIConfig {
   apiKey: string;
   model: string;
@@ -128,9 +133,7 @@ Follow these rules in your answers:
     onUpdate: (text: string) => void
   ): Promise<string> {
     if (!this.document) {
-      throw new Error(
-        "Document not set. Please call setDocument() first."
-      );
+      throw new Error("Document not set. Please call setDocument() first.");
     }
 
     try {
@@ -151,11 +154,16 @@ Follow these rules in your answers:
         content: `Document content:\n${context}\n\nQuestion: ${userQuestion}`,
       };
 
-      const apiMessages = [systemMessage];
+      const apiMessages: OpenAIMessage[] = [systemMessage];
 
       if (this.chatHistory.length > 0) {
         const recentHistory = this.chatHistory.slice(-6);
-        apiMessages.push(...recentHistory);
+        for (const msg of recentHistory) {
+          apiMessages.push({
+            role: msg.role,
+            content: msg.content,
+          });
+        }
       }
 
       apiMessages.push(userContextMessage);
@@ -179,7 +187,9 @@ Follow these rules in your answers:
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error?.message || "API response not received");
+        throw new Error(
+          errorData.error?.message || "API response not received"
+        );
       }
 
       const reader = response.body?.getReader();
@@ -239,9 +249,7 @@ Follow these rules in your answers:
 
   async summarizeDocument(): Promise<string> {
     if (!this.document) {
-      throw new Error(
-        "Document not set. Please call setDocument() first."
-      );
+      throw new Error("Document not set. Please call setDocument() first.");
     }
 
     try {
@@ -299,7 +307,9 @@ Pay attention to the following in the summary:
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error?.message || "API response not received");
+        throw new Error(
+          errorData.error?.message || "API response not received"
+        );
       }
 
       const data = await response.json();
@@ -314,9 +324,7 @@ Pay attention to the following in the summary:
 
   async extractKeyTopics(): Promise<string[]> {
     if (!this.document) {
-      throw new Error(
-        "Document not set. Please call setDocument() first."
-      );
+      throw new Error("Document not set. Please call setDocument() first.");
     }
 
     try {
@@ -363,7 +371,9 @@ Format your response as a list of only the topics or concepts, with each topic b
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error?.message || "API response not received");
+        throw new Error(
+          errorData.error?.message || "API response not received"
+        );
       }
 
       const data = await response.json();
@@ -371,8 +381,8 @@ Format your response as a list of only the topics or concepts, with each topic b
 
       return topicsText
         .split("\n")
-        .map((line) => line.trim())
-        .filter((line) =>
+        .map((line: string) => line.trim())
+        .filter((line: string) =>
           line && !line.startsWith("-") ? line.replace(/^-\s*/, "") : line
         );
     } catch (error) {
