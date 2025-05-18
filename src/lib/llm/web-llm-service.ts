@@ -1,6 +1,11 @@
 "use client";
 
-import { CreateMLCEngine, MLCEngine } from "@mlc-ai/web-llm";
+import {
+  CreateMLCEngine,
+  MLCEngine,
+  ChatModule,
+  type InitProgressCallback,
+} from "@mlc-ai/web-llm";
 import { ProcessedDocument } from "../document-processing/document-utils";
 
 const MODEL_NAME = "Llama-3-8B-Instruct-q4f32_1-MLC";
@@ -8,11 +13,6 @@ const MODEL_NAME = "Llama-3-8B-Instruct-q4f32_1-MLC";
 interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
-}
-
-interface ProgressReport {
-  progress: number;
-  [key: string]: any;
 }
 
 export class WebLLMService {
@@ -23,6 +23,12 @@ export class WebLLMService {
   private initError: (error: string) => void = () => {};
   private document: ProcessedDocument | null = null;
   private chatHistory: Array<ChatMessage> = [];
+  private chat: ChatModule;
+  private onProgress: ((progress: number) => void) | null = null;
+
+  constructor() {
+    this.chat = new ChatModule();
+  }
 
   async init(
     onProgress: (progress: number) => void,
@@ -35,7 +41,7 @@ export class WebLLMService {
 
     this.initPromise = new Promise<void>(async (resolve, reject) => {
       try {
-        const initProgressCallback = (report: ProgressReport) => {
+        const initProgressCallback = (report: { progress: number }) => {
           const progressValue = Math.floor(report.progress * 100);
           onProgress(progressValue);
         };
@@ -350,6 +356,29 @@ Format your response as a list of only the topics or concepts, with each topic b
     } catch (error) {
       console.error("Key topic extraction error:", error);
       throw new Error("Error extracting key topics.");
+    }
+  }
+
+  async initChat(
+    model: string,
+    onProgress?: (progress: number) => void
+  ): Promise<void> {
+    this.onProgress = onProgress || null;
+
+    try {
+      await this.chat.reload(
+        model,
+        onProgress
+          ? (((report: { progress: number }) => {
+              if (this.onProgress) {
+                this.onProgress(report.progress);
+              }
+            }) as InitProgressCallback)
+          : undefined
+      );
+    } catch (error) {
+      console.error("Failed to initialize chat:", error);
+      throw error;
     }
   }
 }

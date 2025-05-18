@@ -91,7 +91,7 @@ export async function extractContentFromUrl(
     // Check if the URL is valid
     try {
       new URL(url);
-    } catch (e) {
+    } catch {
       throw new Error("Invalid URL format");
     }
 
@@ -111,7 +111,7 @@ export async function extractContentFromUrl(
 
     if (!content || content.trim() === "") {
       throw new Error("Content could not be extracted from the URL.");
-    } 
+    }
 
     const chunks = chunkDocument(content);
 
@@ -187,7 +187,6 @@ async function extractTextContent(file: File): Promise<string> {
   });
 }
 
-
 async function extractMarkdownContent(file: File): Promise<string> {
   try {
     const mdText = await extractTextContent(file);
@@ -210,7 +209,6 @@ async function extractMarkdownContent(file: File): Promise<string> {
     throw new Error("Markdown file could not be processed.");
   }
 }
-
 
 export function chunkDocument(
   content: string,
@@ -254,7 +252,6 @@ export function chunkDocument(
 
   return chunks;
 }
-
 
 function generateDocumentId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 7);

@@ -81,7 +81,7 @@ export function ChatWindow({
               Start by asking a question about your document.
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              Example: "What are the main features of the API described in this document?"
+              Example: &ldquo;What are the main features of the API described in this document?&rdquo;
             </p>
           </div>
         ) : (

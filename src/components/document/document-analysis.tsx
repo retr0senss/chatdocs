@@ -115,7 +115,7 @@ export function DocumentAnalysis({ document, llmService }: DocumentAnalysisProps
     }, 300);
 
     return () => clearTimeout(debounceTimeout);
-  }, [searchQuery]);
+  }, [searchQuery, searchInDocument]);
 
   // Automatic processing when tab changes
   useEffect(() => {
@@ -128,7 +128,15 @@ export function DocumentAnalysis({ document, llmService }: DocumentAnalysisProps
     if (activeTab === "topics" && keyTopics.length === 0 && !isGeneratingTopics) {
       generateKeyTopics();
     }
-  }, [activeTab]);
+  }, [
+    activeTab,
+    summary,
+    isGeneratingSummary,
+    keyTopics.length,
+    isGeneratingTopics,
+    generateSummary,
+    generateKeyTopics
+  ]);
 
   // Clear cache when document changes
   useEffect(() => {
@@ -295,7 +303,7 @@ export function DocumentAnalysis({ document, llmService }: DocumentAnalysisProps
                     searchResults.length > 0 ? (
                       <div className="space-y-3">
                         <p className="text-xs text-muted-foreground">
-                          {searchResults.length} results found for "{searchQuery}"
+                          {searchResults.length} results found for &ldquo;{searchQuery}&rdquo;
                         </p>
                         {searchResults.map((result, index) => (
                           <div key={index} className="bg-muted p-3 rounded-md">
@@ -314,7 +322,7 @@ export function DocumentAnalysis({ document, llmService }: DocumentAnalysisProps
                     ) : (
                       <div className="flex flex-col items-center justify-center py-8">
                         <p className="text-sm text-muted-foreground">
-                          No results found for "{searchQuery}"
+                          No results found for &ldquo;{searchQuery}&rdquo;
                         </p>
                       </div>
                     )

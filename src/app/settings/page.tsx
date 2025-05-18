@@ -12,7 +12,6 @@ import Link from "next/link";
 
 export default function SettingsPage() {
   const [apiSettings, setApiSettings] = useState<ApiSettingsType | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
 
   // Load settings
   useEffect(() => {
@@ -22,7 +21,6 @@ export default function SettingsPage() {
 
   // Update and save API settings
   const handleUpdateApiSettings = async (settings: ApiSettingsType) => {
-    setIsSaving(true);
     try {
       saveApiSettings(settings);
       setApiSettings(settings);
@@ -30,8 +28,6 @@ export default function SettingsPage() {
     } catch (error) {
       toast.error("An error occurred while saving settings");
       console.error("Could not save settings:", error);
-    } finally {
-      setIsSaving(false);
     }
   };
 

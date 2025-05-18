@@ -129,7 +129,7 @@ export function ApiSettings({
       } else {
         toast.error("Connection failed. Check your settings.");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred during the connection test");
     } finally {
       setIsTesting(false);
